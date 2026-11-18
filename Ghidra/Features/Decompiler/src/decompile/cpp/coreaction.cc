@@ -5962,6 +5962,7 @@ void ActionDatabase::universalAction(Architecture *conf)
 	actprop->addRule( new RuleAddMultCollapse("analysis") );
 	actprop->addRule( new RuleCollapseConstants("analysis") );
 	actprop->addRule( new RuleTransformCpool("analysis") );
+	actprop->addRule( new RuleFoldTemporary("analysis") );
 	actprop->addRule( new RulePropagateCopy("analysis") );
 	actprop->addRule( new RuleZextEliminate("analysis") );
 	actprop->addRule( new RuleSlessToLess("analysis") );

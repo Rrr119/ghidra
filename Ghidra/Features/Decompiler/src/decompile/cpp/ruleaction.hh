@@ -714,6 +714,17 @@ public:
   virtual void getOpList(vector<uint4> &oplist) const;
   virtual int4 applyOp(PcodeOp *op,Funcdata &data);
 };
+class RuleFoldTemporary : public Rule {
+  static bool isFoldableTemporary(const Varnode *vn);
+public:
+  RuleFoldTemporary(const string &g) : Rule(g, 0, "foldtemporary") {}	///< Constructor
+  virtual Rule *clone(const ActionGroupList &grouplist) const {
+    if (!grouplist.contains(getGroup())) return (Rule *)0;
+    return new RuleFoldTemporary(getGroup());
+  }
+  virtual void getOpList(vector<uint4> &oplist) const;
+  virtual int4 applyOp(PcodeOp *op,Funcdata &data);
+};
 class RulePropagateCopy : public Rule {
 public:
   RulePropagateCopy(const string &g) : Rule(g, 0, "propagatecopy") {}	///< Constructor

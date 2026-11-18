@@ -1,0 +1,18 @@
+{
+  "uid": "23354",
+  "harness": "Codex CLI",
+  "snapshotUrl": "https://github.com/Rrr119/ghidra/commit/80233a38d6aaf83d2d9c9fe154d2bc66b90ef223",
+  "harnessVersion": "codex-cli 0.167.2",
+  "operatingSystem": "Ubuntu 26.04.1 LTS",
+  "operatingSystemCell": [
+    "MacOS/Linux"
+  ],
+  "outputDirectory": "/home/dev/feedback/uid23354",
+  "wslDistro": "Ubuntu-26.04",
+  "B": {
+    "success": false,
+    "canceled": true,
+    "error": "任务已取消",
+    "side": "B"
+  }
+}

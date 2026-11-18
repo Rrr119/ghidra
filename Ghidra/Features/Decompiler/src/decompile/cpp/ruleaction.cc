@@ -3912,6 +3912,66 @@ int4 RuleTransformCpool::applyOp(PcodeOp *op,Funcdata &data)
   return 1;
 }
 
+/// \brief Check if a Varnode is a temporary that may have its definition folded
+///
+/// The Varnode must be in the internal \e unique space and must not carry storage or
+/// symbol properties that make its identity observable outside the data-flow graph.
+/// \param vn is the Varnode to check
+/// \return \b true if the Varnode is a foldable temporary
+bool RuleFoldTemporary::isFoldableTemporary(const Varnode *vn)
+
+{
+  if (vn == (const Varnode *)0) return false;
+  if (vn->getSpace()->getType() != IPTR_INTERNAL) return false;
+  if (vn->isConstant() || vn->isAnnotation() || vn->isInput()) return false;
+  if (vn->isAddrTied() || vn->isMapped() || vn->isAddrForce()) return false;
+  if (vn->isAutoLive()) return false;
+  return true;
+}
+
+/// \class RuleFoldTemporary
+/// \brief Fold the COPY of a single-use temporary into the destination temporary
+///
+/// A temporary is first defined by an operation and then copied to another temporary:
+///   - `t0 = OP(...)`
+///   - `t1 = COPY t0`
+///
+/// If nothing else reads \b t0, the defining operation can write \b t1 directly, and the
+/// COPY is removed:
+///   - `t1 = OP(...)`
+///
+/// The defining operation is not moved, duplicated, or otherwise reordered, so evaluation
+/// order and side effects are preserved.  The transformation is skipped if either Varnode
+/// has an observable storage location or if folding would make the defining operation read
+/// its own output.
+void RuleFoldTemporary::getOpList(vector<uint4> &oplist) const
+
+{
+  oplist.push_back(CPUI_COPY);
+}
+
+int4 RuleFoldTemporary::applyOp(PcodeOp *op,Funcdata &data)
+
+{
+  Varnode *dest = op->getOut();
+  Varnode *src = op->getIn(0);
+  if (dest == src) return 0;
+  if (!isFoldableTemporary(dest) || !isFoldableTemporary(src)) return 0;
+  if (dest->getSize() != src->getSize()) return 0;
+  if (dest->hasNoDescend()) return 0;		// Folding would only create dead data-flow
+  if (op->isIncidentalCopy() || op->isReturnCopy()) return 0;
+  if (src->loneDescend() != op) return 0;	// The source must become unused
+  PcodeOp *defOp = src->getDef();
+  if (defOp == (PcodeOp *)0 || defOp == op) return 0;
+  if (defOp->getSlot(dest) < defOp->numInput()) return 0;	// Don't create a self-reference
+  if (dest->isPrecisLo() != src->isPrecisLo() || dest->isPrecisHi() != src->isPrecisHi())
+    return 0;
+
+  data.opSetOutput(defOp,dest);	// Move the definition to the surviving temporary
+  data.opDestroy(op);		// The COPY and the consumed source temporary are now unnecessary
+  return 1;
+}
+
 /// \class RulePropagateCopy
 /// \brief Propagate the input of a COPY to all the places that read the output
 void RulePropagateCopy::getOpList(vector<uint4> &oplist) const
