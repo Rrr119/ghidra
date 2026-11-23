@@ -1,0 +1,17 @@
+{
+  "root": "/home/dev/feedback/uid34550",
+  "B": "/home/dev/feedback/uid34550",
+  "sha": "5fa8213eeb29ef3f643f6797b1a4bd5422c9fc20",
+  "wslDistro": "Ubuntu-26.04",
+  "source": {
+    "owner": "NationalSecurityAgency",
+    "repo": "ghidra",
+    "sha": "5fa8213eeb29ef3f643f6797b1a4bd5422c9fc20"
+  },
+  "fork": {
+    "owner": "Rrr119",
+    "repo": "ghidra",
+    "cloneUrl": "https://github.com/Rrr119/ghidra.git"
+  },
+  "at": "2026-11-23T03:38:41.326Z"
+}
